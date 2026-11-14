@@ -1,0 +1,36 @@
+name: Quality checks
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Install from lockfile
+        run: npm ci
+      - name: Lint
+        run: npm run lint
+      - name: Native tests
+        run: npm run test:native
+      - name: Unit and frontend tests
+        run: npm test
+      - name: Offline AI contract evaluation
+        run: npm run eval:ai
+      - name: Frontend build
+        run: npm run build
+
+# PostgreSQL integration and Playwright E2E require separately provisioned
+# isolated infrastructure; neither is silently marked successful in this CI.

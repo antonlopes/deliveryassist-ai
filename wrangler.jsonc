@@ -1,0 +1,35 @@
+{
+  "name": "deliveryassist-ai",
+  "main": "workers/entry.js",
+  "compatibility_date": "2026-11-13",
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": {
+    "directory": "./client/dist",
+    "binding": "ASSETS",
+    "not_found_handling": "single-page-application",
+    "run_worker_first": ["/api", "/api/*", "/healthz", "/readyz"]
+  },
+  "hyperdrive": [
+    {
+      "binding": "HYPERDRIVE",
+      "id": "REPLACE_WITH_YOUR_HYPERDRIVE_ID"
+    }
+  ],
+  "vars": {
+    "NODE_ENV": "production",
+    "DEMO_MODE": "true",
+    "AI_ENABLED": "false",
+    "AI_PROVIDER": "gemini_native",
+    "AI_MODEL": "gemini-3.5-flash-lite",
+    "AI_BASE_URL": "https://generativelanguage.googleapis.com/v1beta",
+    "AI_MAX_OUTPUT_TOKENS": "1500",
+    "DEMO_RESET_HOURS": "24",
+    "LATE_GRACE_MINUTES": "5",
+    "SESSION_MAX_HOURS": "8",
+    "AI_DAILY_GLOBAL_LIMIT": "100",
+    "AI_DAILY_SESSION_LIMIT": "30",
+    "AI_DAILY_USER_LIMIT": "50",
+    "AI_SESSION_PER_MINUTE_LIMIT": "3"
+  },
+  "observability": { "enabled": true }
+}

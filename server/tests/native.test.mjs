@@ -1,0 +1,21 @@
+// Executable without npm dependencies: independent structural/safety checks.
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {CATEGORIES,PRIORITIES,INC_STATUSES,lateSQL,delaySQL,closed,assertUUID,string,paging,safeText} from '../src/domain/common.js';
+import {validateIntent,validateReply,normalizeAction} from '../src/ai/contracts.js';
+const id='6fec8c9e-7678-4b1b-b595-f9c1dd35ee68';
+const intent={intent:'GET_ORDER',order_code:'PED-1052',incident_id:null,needs_clarification:false,clarifying_question:null,requested_actions:[],rationale_brief:null};
+const reply={answer:'Consulta validada.',evidence_refs:[{entity_type:'ORDER',entity_id:id}],proposed_actions:[],requires_clarification:false,clarifying_question:null};
+test('SQL atraso exclui entrega/cancelamento e soma tolerância',()=>{assert.match(lateSQL(),/NOT IN \('DELIVERED','CANCELED'\)/);assert.match(lateSQL(),/interval '5 minutes'/);});
+test('delay_minutes não negativo',()=>{assert.match(delaySQL(),/greatest\(0,floor/);});
+test('enums seguem contrato',()=>{assert.deepEqual(PRIORITIES,['LOW','MEDIUM','HIGH']);assert.equal(CATEGORIES.length,6);assert.equal(INC_STATUSES.length,3);});
+test('validação recusa chaves não previstas',()=>{assert.throws(()=>closed({sql:'DELETE'},['order_code']));});
+test('validação recusa UUID malformado',()=>assert.throws(()=>assertUUID('1; DROP TABLE users')));
+test('validação limita strings',()=>assert.throws(()=>string('abc',15,1000)));
+test('paginação max 50',()=>assert.throws(()=>paging({page:'1',page_size:'200'})));
+test('classificação fechada exige todas as chaves',()=>{assert.equal(validateIntent(intent).intent,'GET_ORDER');assert.throws(()=>validateIntent({...intent,extra:'YES'}));});
+test('classificação recusa ação proibida',()=>assert.throws(()=>validateIntent({...intent,requested_actions:['RUN_SQL']})));
+test('resposta IA estrita',()=>{assert.equal(validateReply(reply).answer,'Consulta validada.');assert.throws(()=>validateReply({...reply,proposed_actions:[{type:'CALL_URL'}]}));});
+test('validação rejeita ID de alvo trocado por IA',()=>assert.throws(()=>normalizeAction({type:'CREATE_INCIDENT',target_ref:{entity_type:'ORDER',entity_id:id},parameters:{category:'DELIVERY_DELAY',priority:'HIGH',description:'Descrição de teste com tamanho mínimo.'},reason:'Atrasado'}, {order:{id:'4c54f410-63e4-4dd2-be06-3f6a5c8d7bc1'}})));
+test('versão de incidente vem do banco e não do modelo',()=>{const a=normalizeAction({type:'SET_INCIDENT_PRIORITY',target_ref:{entity_type:'INCIDENT',entity_id:id},parameters:{priority:'HIGH'},reason:'Alta atenção'}, {incident:{id,version:11}});assert.equal(a.parameters.expected_version,11);});
+test('HTML não passa literalmente para resposta sugerida',()=>assert.equal(safeText('<script>alert(1)</script>Olá',100),'alert(1)Olá'));

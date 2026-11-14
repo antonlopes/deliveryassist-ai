@@ -1,0 +1,5 @@
+import React from 'react';
+import {Box,Dialog,DialogActions,DialogContent,DialogTitle,Button,Typography,Alert} from '@mui/material';
+import {MutationButton} from './Shared.jsx';
+export function Feedback({error,success}){return <Box role="status" aria-live="polite">{error&&<Alert severity="error" sx={{my:1}}>{error.message||error}</Alert>}{success&&<Alert severity="success" sx={{my:1}}>{success}</Alert>}</Box>}
+export function ConfirmDialog({open,onClose,onConfirm,title='Confirmar operação',details,loading=false}){return <Dialog open={Boolean(open)} onClose={loading?undefined:onClose} maxWidth="sm" fullWidth><DialogTitle>{title}</DialogTitle><DialogContent><Typography sx={{whiteSpace:'pre-wrap'}}>{details}</Typography><Typography variant="body2" color="text.secondary" sx={{mt:1}}>A operação só será executada após sua confirmação explícita.</Typography></DialogContent><DialogActions><Button onClick={onClose} disabled={loading}>Voltar</Button><MutationButton loading={loading} variant="contained" onClick={onConfirm}>Confirmar</MutationButton></DialogActions></Dialog>}

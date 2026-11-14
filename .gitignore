@@ -1,0 +1,18 @@
+node_modules/
+client/dist/
+.env
+.env.*
+!.env.example
+coverage/
+test-results/
+playwright-report/
+.wrangler/
+.wrangler-build/
+.DS_Store
+
+# Generated OS archives, temporary files and local secrets
+__MACOSX/
+*.backup.js
+*.log
+.env.local
+.env.production

@@ -1,0 +1,24 @@
+DELIVERYASSIST AI - PACOTE PARA CLOUDFLARE WORKERS
+=================================================
+
+1. Extraia este ZIP para uma pasta em seu computador.
+2. Leia docs/DEPLOY-CLOUDFLARE.md ANTES de publicar.
+3. Em um computador com Node 22+ e acesso ao npm, execute:
+     npm install
+     cp .env.example .env
+   Configure no .env um PostgreSQL de demonstração, segredos e senhas.
+4. Inicialize o banco e gere a interface:
+     npm run db:migrate
+     npm run db:seed
+     npm run build
+5. Configure Cloudflare Hyperdrive e os Worker secrets. Em seguida:
+     npx wrangler login
+     npx wrangler deploy
+6. Se ativar IA, adicione credenciais reais em secrets e valide o smoke test.
+
+IMPORTANTE: este ZIP tem o codigo-fonte; NAO funciona arrastado ao
+Cloudflare Pages Direct Upload (somente arquivos estaticos). Use Workers.
+
+STATUS: 13 testes nativos passaram. Build npm, testes com banco,
+chamada IA real e publicacao Cloudflare ainda precisam de execucao.
+Consulte docs/TEST-REPORT.md e docs/IMPLEMENTATION-REPORT.md.
